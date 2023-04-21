@@ -1,0 +1,10 @@
+# Nhập dãy số nguyên từ bàn phím
+input_string = input("Nhập dãy số nguyên, cách nhau bằng dấu cách: ")
+
+# Chuyển đổi chuỗi đầu vào thành một danh sách các số nguyên
+integer_list = list(map(int, input_string.split()))
+
+# In ra danh sách các số nguyên đã nhập
+print("Dãy số nguyên đã nhập:", integer_list)
+print("Sắp xếp theo thứ tự tăng dần: ")
+print(sorted(integer_list))
