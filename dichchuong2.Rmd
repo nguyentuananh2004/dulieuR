@@ -1,0 +1,612 @@
+3   Xác suất rời rạc
+
+Chúng tôi bắt đầu bằng cách đề cập đến một số nguyên tắc cơ bản liên quan đến dữ liệu phân loại. Tập hợp con của xác suất được gọi là xác suất rời rạc . Nó sẽ giúp chúng ta hiểu lý thuyết xác suất mà sau này chúng ta sẽ giới thiệu cho dữ liệu số và dữ liệu liên tục, vốn phổ biến hơn nhiều trong các ứng dụng khoa học dữ liệu. Xác suất rời rạc hữu ích hơn trong các trò chơi bài và do đó chúng tôi sử dụng chúng làm ví dụ.
+
+3.1 Tần số tương đối
+Xác suất từ ​​được sử dụng trong ngôn ngữ hàng ngày. Trả lời các câu hỏi về xác suất thường khó, nếu không muốn nói là không thể. Ở đây chúng ta thảo luận về một định nghĩa toán học về xác suất cho phép chúng ta đưa ra câu trả lời chính xác cho một số câu hỏi nhất định.
+
+Ví dụ: nếu tôi có 2 hạt màu đỏ và 3 hạt màu xanh bên trong một chiếc bình 1 (hầu hết các sách xác suất đều sử dụng thuật ngữ cổ xưa này, vì vậy chúng tôi cũng vậy) và tôi chọn ngẫu nhiên một hạt, xác suất chọn được hạt màu đỏ là bao nhiêu? Trực giác mách bảo chúng ta rằng câu trả lời là 2/5 hoặc 40%. Một định nghĩa chính xác có thể được đưa ra bằng cách lưu ý rằng có năm kết quả có thể xảy ra, trong đó có hai kết quả thỏa mãn điều kiện cần thiết cho sự kiện “nhặt một hạt màu đỏ”. Vì mỗi kết quả trong số năm kết quả đều có cùng cơ hội xảy ra nên chúng tôi kết luận rằng xác suất xảy ra là 0,4 đối với màu đỏ và 0,6 đối với màu xanh lam.
+
+Một cách hữu hình hơn để nghĩ về xác suất của một sự kiện là tỷ lệ số lần sự kiện xảy ra khi chúng ta lặp lại thí nghiệm vô số lần, độc lập và trong cùng điều kiện.
+
+3.2 Ký hiệu
+Chúng tôi sử dụng ký hiệu Pr(A) để biểu thị xác suất của sự kiện A đang xảy ra. Chúng ta sử dụng thuật ngữ sự kiện rất chung chung để chỉ những điều có thể xảy ra khi điều gì đó xảy ra một cách tình cờ. Trong ví dụ trước của chúng tôi, sự kiện là “nhặt một hạt màu đỏ”. Trong một cuộc thăm dò chính trị mà chúng tôi gọi ngẫu nhiên 100 cử tri có khả năng sẽ bỏ phiếu, một ví dụ về sự kiện là “kêu gọi 48 đảng viên Đảng Dân chủ và 52 đảng viên Đảng Cộng hòa”.
+
+Trong các ứng dụng khoa học dữ liệu, chúng ta thường xử lý các biến liên tục. Những sự kiện này thường sẽ là những câu như “người này có cao hơn 6 feet không”. Trong trường hợp này, chúng ta viết các sự kiện ở dạng toán học hơn: X>=6. Chúng ta sẽ thấy nhiều hơn những ví dụ này sau. Ở đây chúng tôi tập trung vào dữ liệu phân loại.
+ 
+ 3.3 Phân bố xác suất
+Nếu chúng ta biết tần suất tương đối của các loại khác nhau thì việc xác định sự phân bổ cho các kết quả được phân loại là tương đối đơn giản. Chúng tôi chỉ đơn giản gán một xác suất cho từng loại. Trong những trường hợp có thể coi là những hạt trong bình, đối với mỗi loại hạt, tỷ lệ của chúng sẽ xác định sự phân bổ.
+
+Nếu chúng ta gọi ngẫu nhiên những cử tri có khả năng sẽ bỏ phiếu từ một nhóm dân số gồm 44% Đảng Dân chủ, 44% Đảng Cộng hòa, 10% chưa quyết định và 2% Đảng Xanh, thì các tỷ lệ này sẽ xác định xác suất cho mỗi nhóm. Phân bố xác suất là:
+
+Pr (chọn một đảng viên Đảng Cộng hòa)	=	0,44
+Pr (chọn một đảng viên Đảng Dân chủ)	=	0,44
+Pr (chọn một câu chưa quyết định)	=	0,10
+Pr (chọn màu xanh lá cây)	=	0,02
+
+3.4 Monte Carlo
+Máy tính cung cấp một cách để thực sự thực hiện thí nghiệm ngẫu nhiên đơn giản được mô tả ở trên: chọn ngẫu nhiên một hạt từ một túi chứa ba hạt màu xanh và hai hạt màu đỏ. Trình tạo số ngẫu nhiên cho phép chúng tôi bắt chước quá trình chọn ngẫu nhiên.
+
+Một ví dụ là samplehàm trong R. Chúng tôi minh họa cách sử dụng nó trong đoạn mã bên dưới. Đầu tiên, chúng ta sử dụng hàm repđể tạo bình:
+
+
+```{r}
+beads <- rep(c("red", "blue"), times = c(2,3))
+beads
+
+#> [1] "red"  "red"  "blue" "blue" "blue"
+```
+
+và sau đó sử dụng sampleđể chọn ngẫu nhiên một hạt:
+
+
+
+```{r}
+sample(beads, 1)
+#> [1] "blue"
+```
+
+Dòng mã này tạo ra một kết quả ngẫu nhiên. Chúng tôi muốn lặp lại thí nghiệm này vô số lần, nhưng không thể lặp lại mãi mãi. Thay vào đó, chúng tôi lặp lại thí nghiệm với số lần đủ lớn để tạo ra kết quả thực tế tương đương với việc lặp lại mãi mãi. Đây là một ví dụ về mô phỏng Monte Carlo .
+
+Phần lớn những gì các nhà thống kê toán học và lý thuyết nghiên cứu, mà chúng tôi không đề cập đến trong cuốn sách này, liên quan đến việc đưa ra các định nghĩa chặt chẽ về “thực tế tương đương” cũng như nghiên cứu xem một số lượng lớn các thí nghiệm đưa chúng ta đến gần những gì xảy ra trong giới hạn đến mức nào. Ở phần sau của phần này, chúng tôi cung cấp một cách tiếp cận thực tế để quyết định thế nào là “đủ lớn”.
+
+Để thực hiện mô phỏng Monte Carlo đầu tiên, chúng tôi sử dụng replicatehàm này, cho phép chúng tôi lặp lại cùng một nhiệm vụ bao nhiêu lần. Ở đây, chúng tôi lặp lại sự kiện ngẫu nhiên B=10.000 lần:
+
+```{r}
+B <- 10000
+events <- replicate(B, sample(beads, 1))
+```
+
+Bây giờ chúng ta có thể xem liệu định nghĩa của chúng ta có thực sự phù hợp với phép tính gần đúng mô phỏng Monte Carlo này hay không. Chúng ta có thể sử dụng tableđể xem phân phối:
+```{r}
+tab <- table(events)
+tab
+#> events
+#> blue  red 
+#> 6028 3972
+
+```
+
+
+và prop.tablecho chúng ta tỷ lệ:
+```{r}
+prop.table(tab)
+#> events
+#>  blue   red 
+#> 0.603 0.397
+```
+
+
+
+Những con số trên là xác suất ước tính được cung cấp bởi mô phỏng Monte Carlo này. Lý thuyết thống kê, không được đề cập ở đây, cho chúng ta biết rằng cũng như B càng lớn thì ước tính càng tiến gần đến 3/5=.6 và 2/5=.4.
+
+Mặc dù đây là một ví dụ đơn giản và không hữu ích lắm, nhưng chúng ta sẽ sử dụng mô phỏng Monte Carlo để ước tính xác suất trong những trường hợp khó tính toán xác suất chính xác hơn. Trước khi đi sâu vào các ví dụ phức tạp hơn, chúng tôi sử dụng các ví dụ đơn giản để trình diễn các công cụ tính toán có sẵn trong R.
+ 
+ 3.4.1 Đặt hạt giống ngẫu nhiên
+Trước khi tiếp tục, chúng tôi sẽ giải thích ngắn gọn dòng mã quan trọng sau:
+```{r}
+set.seed(1986) 
+```
+
+
+
+Xuyên suốt cuốn sách này, chúng tôi sử dụng các trình tạo số ngẫu nhiên. Điều này ngụ ý rằng nhiều kết quả được trình bày thực sự có thể thay đổi một cách tình cờ, điều này cho thấy rằng phiên bản cố định của cuốn sách có thể hiển thị kết quả khác với kết quả bạn nhận được khi cố gắng viết mã như được hiển thị trong cuốn sách. Điều này thực sự ổn vì kết quả là ngẫu nhiên và thay đổi theo thời gian. Tuy nhiên, nếu bạn muốn đảm bảo rằng kết quả giống hệt nhau mỗi khi chạy chúng, bạn có thể đặt hạt giống tạo số ngẫu nhiên của R thành một số cụ thể. Ở trên, chúng tôi đặt nó là 1986. Chúng tôi muốn tránh sử dụng cùng một hạt giống mọi lúc. Cách chọn hạt phổ biến là chọn năm - tháng - ngày. Ví dụ: chúng tôi đã chọn 1986 vào ngày 20 tháng 12 năm 2018: 2018 -12 -20 = 1986
+.
+
+Bạn có thể tìm hiểu thêm về cách thiết lập hạt giống bằng cách xem tài liệu:
+```{r}
+?set.seed
+```
+
+
+
+Trong các bài tập, chúng tôi có thể yêu cầu bạn đặt hạt giống để đảm bảo rằng kết quả bạn thu được chính xác là những gì chúng tôi mong đợi.
+
+3.4.2 Có và không thay thế
+Hàm này samplecó một đối số cho phép chúng ta chọn nhiều phần tử từ bình. Tuy nhiên, theo mặc định, lựa chọn này diễn ra mà không cần thay thế : sau khi một hạt được chọn, nó sẽ không được đưa trở lại túi. Hãy chú ý điều gì sẽ xảy ra khi chúng ta yêu cầu chọn ngẫu nhiên năm hạt:
+```{r}
+
+sample(beads, 5)
+#> [1] "red"  "blue" "blue" "blue" "red"
+sample(beads, 5)
+#> [1] "red"  "red"  "blue" "blue" "blue"
+sample(beads, 5)
+#> [1] "blue" "red"  "blue" "red"  "blue"
+
+```
+
+Điều này dẫn đến sự sắp xếp lại luôn có ba hạt màu xanh và hai hạt màu đỏ. Nếu chúng tôi yêu cầu chọn sáu hạt, chúng tôi sẽ gặp lỗi:
+```{r}
+
+sample(beads, 6)
+```
+
+
+Error in sample.int(length(x), size, replace, prob) :    cannot take a sample larger than the population when 'replace = FALSE'
+
+Tuy nhiên, samplechức năng này có thể được sử dụng trực tiếp mà không cần sử dụng replicate, để lặp lại cùng một thí nghiệm chọn 1 trong 5 hạt, liên tục, trong cùng điều kiện. Để làm điều này, chúng tôi lấy mẫu bằng phương pháp thay thế : trả hạt trở lại bình sau khi chọn nó. Chúng ta có thể yêu cầu samplethực hiện điều này bằng cách thay đổi replaceđối số, mặc định là FALSE, thành replace = TRUE:
+```{r}
+
+events <- sample(beads, B, replace = TRUE)
+prop.table(table(events))
+#> events
+#>  blue   red 
+#> 0.602 0.398
+```
+
+
+Không có gì ngạc nhiên khi chúng tôi nhận được kết quả rất giống với kết quả thu được trước đó với replicate.
+
+3.5 Độc lập
+Ta nói hai sự kiện độc lập nếu kết quả của sự kiện này không ảnh hưởng đến sự kiện kia. Ví dụ kinh điển là việc tung đồng xu. Mỗi lần chúng ta tung một đồng xu công bằng, xác suất nhìn thấy mặt ngửa là 1/2 bất kể những lần tung trước đó cho thấy điều gì. Điều này cũng đúng khi chúng ta nhặt hạt từ chiếc bình để thay thế. Trong ví dụ trên, xác suất trúng màu đỏ là 0,40 bất kể các lần rút trước đó.
+
+Nhiều ví dụ về các sự kiện không độc lập đến từ các trò chơi bài. Khi chúng ta chia lá bài đầu tiên, xác suất để có được quân Vua là 1/13 vì có 13 khả năng: Át, Deuce, Ba,..., Mười, Jack, Nữ hoàng, Vua và Át. Bây giờ, nếu chúng ta chia quân Vua cho quân bài đầu tiên và không thay nó vào bộ bài thì xác suất quân bài thứ hai trở thành quân Vua sẽ ít hơn vì chỉ còn lại ba quân Vua: xác suất là 3 trên 51. Những sự kiện này do đó không độc lập : kết quả đầu tiên ảnh hưởng đến kết quả tiếp theo.
+
+Để xem một trường hợp cực đoan của các sự kiện không độc lập, hãy xem xét ví dụ của chúng tôi về việc lấy ngẫu nhiên năm hạt mà không thay thế:
+```{r}
+
+x <- sample(beads, 5)
+```
+
+
+Nếu bạn phải đoán màu của hạt đầu tiên, bạn sẽ dự đoán màu xanh lam vì màu xanh lam có 60% cơ hội. Nhưng nếu tôi cho bạn xem kết quả của bốn kết quả cuối cùng:
+```{r}
+
+x[2:5]
+#> [1] "blue" "blue" "blue" "red"
+```
+
+
+bạn vẫn đoán màu xanh chứ? Dĩ nhiên là không. Bây giờ bạn biết rằng xác suất có màu đỏ là 1 vì hạt duy nhất còn lại có màu đỏ. Các sự kiện không độc lập nên xác suất thay đổi.
+
+3.6 Xác suất có điều kiện
+Khi các sự kiện không độc lập, xác suất có điều kiện rất hữu ích. Chúng ta đã thấy một ví dụ về xác suất có điều kiện: chúng ta đã tính xác suất để lá bài được chia thứ hai là Vua nếu lá bài đầu tiên là Vua. Trong xác suất, chúng tôi sử dụng ký hiệu sau:
+
+ Pr( Card 2 is a king | Card 1 is a king) = 3/51
+ 
+Chúng tôi sử dụng | như cách viết tắt của “cho rằng” hoặc “có điều kiện”.
+
+Khi có hai sự kiện, nói A Và B, độc lập, ta có:
+
+Pr(A|B) = Pr(A)
+
+Đây là cách nói toán học: thực tế là B xảy ra không ảnh hưởng đến xác suất xảy ra A đang xảy ra. Trên thực tế, đây có thể được coi là định nghĩa toán học về tính độc lập.
+
+
+3.7 Quy tắc cộng và nhân
+3.7.1 Quy tắc nhân
+Nếu chúng ta muốn biết xác suất của hai sự kiện, hãy nói A va B, xảy ra, chúng ta có thể sử dụng quy tắc nhân:
+
+Pr(A and B)=Pr(A)Pr(B|A)
+
+Hãy lấy Blackjack làm ví dụ. Trong Blackjack, bạn được chia hai lá bài ngẫu nhiên. Sau khi bạn thấy những gì bạn có, bạn có thể yêu cầu nhiều hơn. Mục tiêu là đến gần 21 hơn người chia bài mà không cần vượt qua. Các lá bài mặt có giá trị 10 điểm và quân Át có giá trị 11 hoặc 1 (bạn chọn).
+
+Vì vậy, trong trò chơi Blackjack, để tính cơ hội nhận được số 21 bằng cách rút một quân Át và sau đó là một quân bài mặt, chúng ta tính xác suất của quân Át đầu tiên và nhân với xác suất rút được một quân bài mặt hoặc một quân 10 cho trước đầu tiên là quân Át:1/13 x 16/51 gần bằng 0,025
+
+Quy tắc nhân cũng áp dụng cho nhiều hơn hai sự kiện. Chúng ta có thể sử dụng quy nạp để mở rộng cho nhiều sự kiện hơn:
+
+Pr(A và B và C)= Pr(A)Pr(B|A)Pr(C|A va B)
+
+3.7.2 Quy tắc nhân độc lập
+Khi chúng ta có các sự kiện độc lập thì quy tắc nhân trở nên đơn giản hơn:
+Pr(A và B và C)= Pr(A)Pr(B)Pr(C)
+
+Nhưng chúng ta phải rất cẩn thận trước khi sử dụng điều này vì giả định tính độc lập có thể dẫn đến các phép tính xác suất rất khác và không chính xác khi chúng ta thực sự không có tính độc lập.
+
+Ví dụ, hãy tưởng tượng một phiên tòa trong đó nghi phạm được mô tả là có ria mép và râu. Bị cáo có ria mép và bên công tố mời một “chuyên gia” đến làm chứng rằng 1/10 nam giới có râu và 1/5 có ria mép nên dùng quy tắc nhân ta kết luận rằng chỉ 1/10 x 1/5 hoặc 0,02 có cả hai.
+Nhưng để nhân lên như thế này chúng ta cần phải có sự độc lập! Giả sử xác suất có điều kiện để một người đàn ông có ria mép với điều kiện anh ta phải có râu là 0,95. Vì vậy xác suất tính toán đúng sẽ cao hơn nhiều:
+.
+
+Quy tắc nhân cũng cho chúng ta một công thức chung để tính xác suất có điều kiện:
+
+ 
+
+Để minh họa cách chúng tôi sử dụng các công thức và khái niệm này trong thực tế, chúng tôi sẽ sử dụng một số ví dụ liên quan đến trò chơi bài.
+
+3.7.3 Quy tắc cộng
+Quy tắc cộng cho chúng ta biết rằng:
+
+
+Quy tắc này rất trực quan: hãy nghĩ đến sơ đồ Venn. Nếu chúng ta chỉ cộng các xác suất, chúng ta sẽ đếm giao điểm hai lần nên chúng ta cần trừ một trường hợp.
+
+3.8 Tổ hợp và hoán vị
+Trong ví dụ đầu tiên, chúng ta tưởng tượng một chiếc bình có năm hạt. Xin nhắc lại, để tính toán phân bố xác suất của một lần rút thăm, chúng tôi chỉ cần liệt kê ra tất cả các khả năng. Có 5 và do đó, đối với mỗi sự kiện, chúng tôi đếm xem có bao nhiêu khả năng trong số này có liên quan đến sự kiện đó. Xác suất để chọn được một hạt màu xanh lam là 3/5 vì trong số năm kết quả có thể xảy ra, có ba kết quả là màu xanh lam.
+
+Đối với những trường hợp phức tạp hơn, việc tính toán không đơn giản như vậy. Ví dụ, xác suất để nếu tôi rút năm lá bài mà không thay thế thì tôi nhận được tất cả các lá bài giống nhau, cái được gọi là “xả” trong bài poker là bao nhiêu? Trong khóa học xác suất rời rạc, bạn học lý thuyết về cách thực hiện các phép tính này. Ở đây chúng tôi tập trung vào cách sử dụng mã R để tính toán câu trả lời.
+
+Đầu tiên, chúng ta hãy xây dựng một bộ bài. Để làm điều này, chúng ta sẽ sử dụng hàm expand.gridvà paste. Chúng ta sử dụng pasteđể tạo chuỗi bằng cách nối các chuỗi nhỏ hơn. Để làm điều này, chúng ta lấy số và chất của lá bài rồi tạo tên lá bài như sau:
+
+number <- "Three"
+suit <- "Hearts"
+paste(number, suit)
+#> [1] "Three Hearts"
+
+pastecũng hoạt động trên các cặp vectơ thực hiện thao tác theo từng phần tử:
+
+paste(letters[1:5], as.character(1:5))
+#> [1] "a 1" "b 2" "c 3" "d 4" "e 5"
+
+Hàm expand.gridcung cấp cho chúng ta tất cả sự kết hợp các phần tử của hai vectơ. Ví dụ: nếu bạn có quần xanh và đen và áo sơ mi trắng, xám và kẻ sọc, tất cả các kết hợp của bạn là:
+
+expand.grid(pants = c("blue", "black"), shirt = c("white", "grey", "plaid"))
+#>   pants shirt
+#> 1  blue white
+#> 2 black white
+#> 3  blue  grey
+#> 4 black  grey
+#> 5  blue plaid
+#> 6 black plaid
+
+Đây là cách chúng tôi tạo ra một bộ bài:
+
+suits <- c("Diamonds", "Clubs", "Hearts", "Spades")
+numbers <- c("Ace", "Deuce", "Three", "Four", "Five", "Six", "Seven", 
+             "Eight", "Nine", "Ten", "Jack", "Queen", "King")
+deck <- expand.grid(number = numbers, suit = suits)
+deck <- paste(deck$number, deck$suit)
+
+Với bộ bài đã được xây dựng, chúng ta có thể kiểm tra kỹ xem xác suất xuất hiện quân Vua trong lá bài đầu tiên là 1/13 hay không bằng cách tính tỷ lệ các kết quả có thể xảy ra thỏa mãn điều kiện của chúng ta:
+
+kings <- paste("King", suits)
+mean(deck %in% kings)
+#> [1] 0.0769
+
+Bây giờ, còn xác suất có điều kiện để lá bài thứ hai là Vua khi lá bài đầu tiên là Vua thì sao? Trước đó, chúng ta đã suy luận rằng nếu một Vua đã ra khỏi bộ bài và còn lại 51 quân thì xác suất này là 3/51. Hãy xác nhận bằng cách liệt kê ra tất cả các kết quả có thể xảy ra.
+
+Để làm điều này, chúng ta có thể sử dụng permutationshàm từ gói gtools . Đối với bất kỳ danh sách kích thước nào n, hàm này sẽ tính toán tất cả các kết hợp khác nhau mà chúng ta có thể nhận được khi chọn rcác mục. Dưới đây là tất cả các cách chúng ta có thể chọn hai số từ danh sách bao gồm 1,2,3:
+
+library(gtools)
+permutations(3, 2)
+#>      [,1] [,2]
+#> [1,]    1    2
+#> [2,]    1    3
+#> [3,]    2    1
+#> [4,]    2    3
+#> [5,]    3    1
+#> [6,]    3    2
+
+Lưu ý rằng thứ tự quan trọng ở đây: 3,1 khác với 1,3. Ngoài ra, hãy lưu ý rằng (1,1), (2,2) và (3,3) không xuất hiện vì khi chúng ta chọn một số, số đó không thể xuất hiện lại.
+
+Tùy chọn, chúng ta có thể thêm một vectơ. Nếu bạn muốn xem năm số điện thoại bảy chữ số ngẫu nhiên trong số tất cả các số điện thoại có thể có (không lặp lại), bạn có thể nhập:
+
+all_phone_numbers <- permutations(10, 7, v = 0:9)
+n <- nrow(all_phone_numbers)
+index <- sample(n, 5)
+all_phone_numbers[index,]
+#>      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+#> [1,]    1    3    8    0    6    7    5
+#> [2,]    2    9    1    6    4    8    0
+#> [3,]    5    1    6    0    9    8    2
+#> [4,]    7    4    6    0    2    8    1
+#> [5,]    4    6    5    9    2    8    0
+
+Thay vì sử dụng các số từ 1 đến 10 theo mặc định, nó sử dụng những gì chúng tôi cung cấp thông qua v: các chữ số từ 0 đến 9.
+
+Để tính toán tất cả các cách có thể, chúng ta có thể chọn hai thẻ khi thứ tự quan trọng, chúng ta gõ:
+
+hands <- permutations(52, 2, v = deck)
+
+Đây là ma trận có hai cột và 2652 hàng. Với ma trận chúng ta có thể nhận được lá bài thứ nhất và thứ hai như thế này:
+
+first_card <- hands[,1]
+second_card <- hands[,2]
+
+Bây giờ các trường hợp mà tay đầu tiên là Vua có thể được tính như sau:
+
+kings <- paste("King", suits)
+sum(first_card %in% kings)
+#> [1] 204
+
+Để có được xác suất có điều kiện, chúng tôi tính toán xem phần nào trong số này có quân Vua ở lá bài thứ hai:
+
+sum(first_card %in% kings & second_card %in% kings) / 
+  sum(first_card %in% kings)
+#> [1] 0.0588
+
+chính xác là 3/51, như chúng ta đã suy luận. Lưu ý rằng đoạn mã trên tương đương với:
+
+mean(first_card %in% kings & second_card %in% kings) / 
+  mean(first_card %in% kings)
+#> [1] 0.0588
+
+sử dụng meanthay vì sumvà là phiên bản R của:
+
+ 
+
+Còn nếu thứ tự không quan trọng thì sao? Ví dụ: trong Blackjack nếu bạn nhận được quân Át và quân bài mặt trong lần rút đầu tiên, nó được gọi là Natural 21 và bạn sẽ tự động thắng. Nếu chúng ta muốn tính xác suất xảy ra điều này, chúng ta sẽ liệt kê các kết hợp chứ không phải các hoán vị vì thứ tự không quan trọng.
+
+combinations(3,2)
+#>      [,1] [,2]
+#> [1,]    1    2
+#> [2,]    1    3
+#> [3,]    2    3
+
+Ở dòng thứ hai, kết quả không bao gồm (2,1) vì (1,2) đã được liệt kê. Điều tương tự cũng áp dụng cho (3,1) và (3,2).
+
+Vì vậy, để tính xác suất của Tự nhiên 21 trong Blackjack, chúng ta có thể làm điều này:
+
+aces <- paste("Ace", suits)
+
+facecard <- c("King", "Queen", "Jack", "Ten")
+facecard <- expand.grid(number = facecard, suit = suits)
+facecard <- paste(facecard$number, facecard$suit)
+
+hands <- combinations(52, 2, v = deck)
+mean(hands[,1] %in% aces & hands[,2] %in% facecard)
+#> [1] 0.0483
+
+Ở dòng cuối cùng, chúng tôi giả sử quân Át đến trước. Điều này chỉ là do chúng ta biết cách combinationliệt kê các khả năng và nó sẽ liệt kê trường hợp này đầu tiên. Nhưng để an toàn, chúng ta có thể viết câu này và đưa ra câu trả lời tương tự:
+
+mean((hands[,1] %in% aces & hands[,2] %in% facecard) |
+       (hands[,2] %in% aces & hands[,1] %in% facecard))
+#> [1] 0.0483
+
+3.8.1 Ví dụ Monte Carlo
+Thay vì sử dụng combinationsđể suy ra xác suất chính xác của số 21 tự nhiên, chúng ta có thể sử dụng Monte Carlo để ước tính xác suất này. Trong trường hợp này, chúng ta rút đi rút lại hai lá bài và theo dõi xem chúng ta nhận được bao nhiêu số 21. Chúng ta có thể sử dụng hàm mẫu để rút hai lá bài mà không cần thay thế:
+
+hand <- sample(deck, 2)
+hand
+#> [1] "Queen Clubs"  "Seven Spades"
+
+Sau đó kiểm tra xem một quân bài là Át và quân còn lại là quân bài mặt hay quân 10. Về sau, chúng ta bao gồm 10 khi nói quân bài mặt . Bây giờ chúng ta cần kiểm tra cả hai khả năng:
+
+(hands[1] %in% aces & hands[2] %in% facecard) | 
+  (hands[2] %in% aces & hands[1] %in% facecard)
+#> [1] FALSE
+
+Nếu chúng ta lặp lại điều này 10.000 lần, chúng ta sẽ có được ước tính rất tốt về xác suất của số 21 tự nhiên.
+
+Hãy bắt đầu bằng cách viết một hàm vẽ một bàn tay và trả về TRUE nếu chúng ta nhận được 21. Hàm này không cần bất kỳ đối số nào vì nó sử dụng các đối tượng được xác định trong môi trường toàn cục.
+
+blackjack <- function(){
+   hand <- sample(deck, 2)
+  (hand[1] %in% aces & hand[2] %in% facecard) | 
+    (hand[2] %in% aces & hand[1] %in% facecard)
+}
+
+Ở đây chúng ta phải kiểm tra cả hai khả năng: Át đầu tiên hoặc Át thứ hai vì chúng ta không sử dụng combinationschức năng này. Hàm trả về TRUEnếu chúng ta nhận được 21 và FALSEngược lại:
+
+blackjack()
+#> [1] FALSE
+
+Bây giờ chúng ta có thể chơi trò chơi này, chẳng hạn như 10.000 lần:
+
+B <- 10000
+results <- replicate(B, blackjack())
+mean(results)
+#> [1] 0.0475
+
+3.9 Ví dụ
+Trong phần này, chúng tôi mô tả hai ví dụ phổ biến về xác suất rời rạc: bài toán Monty Hall và bài toán sinh nhật. Chúng tôi sử dụng R để giúp minh họa các khái niệm toán học.
+
+3.9.1 Bài toán Monty Hall
+Vào những năm 1970, có một game show mang tên “Let's Make a Deal” và Monty Hall là người dẫn chương trình. Tại một thời điểm nào đó của trò chơi, các thí sinh được yêu cầu chọn một trong ba cánh cửa. Đằng sau một cánh cửa có một giải thưởng. Các cửa còn lại có một con dê đằng sau để chỉ thí sinh mà họ đã thua. Sau khi thí sinh chọn một cánh cửa, trước khi tiết lộ liệu cánh cửa được chọn có giải thưởng hay không, Monty Hall sẽ mở một trong hai cánh cửa còn lại và cho thí sinh thấy phía sau cánh cửa đó không có giải thưởng. Sau đó anh ấy sẽ hỏi "Bạn có muốn đổi cửa không?" Bạn sẽ làm gì?
+
+Chúng tôi có thể sử dụng xác suất để chứng minh rằng nếu bạn vẫn giữ nguyên lựa chọn cửa ban đầu thì cơ hội trúng giải của bạn vẫn là 1 trên 3. Tuy nhiên, nếu bạn chuyển sang cửa khác, cơ hội thắng của bạn sẽ tăng gấp đôi lên 2 trên 3! Điều này có vẻ phản trực giác. Nhiều người nghĩ sai rằng cả hai cơ hội đều là 1 trên 2 vì bạn đang lựa chọn giữa 2 phương án. Bạn có thể xem phần giải thích toán học chi tiết trên Khan Academy 2 hoặc đọc trên Wikipedia 3 . Dưới đây chúng tôi sử dụng mô phỏng Monte Carlo để xem chiến lược nào tốt hơn. Lưu ý rằng mã này được viết dài hơn mức cần thiết cho mục đích sư phạm.
+
+Hãy bắt đầu với chiến lược cây gậy:
+
+B <- 10000
+monty_hall <- function(strategy){
+  doors <- as.character(1:3)
+  prize <- sample(c("car", "goat", "goat"))
+  prize_door <- doors[prize == "car"]
+  my_pick  <- sample(doors, 1)
+  show <- sample(doors[!doors %in% c(my_pick, prize_door)],1)
+  stick <- my_pick
+  stick == prize_door
+  switch <- doors[!doors%in%c(my_pick, show)]
+  choice <- ifelse(strategy == "stick", stick, switch)
+  choice == prize_door
+}
+stick <- replicate(B, monty_hall("stick"))
+mean(stick)
+#> [1] 0.342
+switch <- replicate(B, monty_hall("switch"))
+mean(switch)
+#> [1] 0.668
+
+Khi chúng tôi viết mã, chúng tôi lưu ý rằng các dòng bắt đầu bằng my_pickvà showkhông có ảnh hưởng đến thao tác logic cuối cùng khi chúng tôi vẫn giữ nguyên lựa chọn ban đầu của mình. Từ đó chúng ta nên nhận ra rằng cơ hội là 1 trên 3, như những gì chúng ta đã bắt đầu. Khi chúng ta chuyển đổi, ước tính Monte Carlo xác nhận phép tính 2/3. Điều này giúp chúng ta hiểu rõ hơn bằng cách cho thấy rằng chúng ta đang loại bỏ một cánh cửa showchắc chắn không phải là người chiến thắng trong các lựa chọn của chúng ta. Chúng tôi cũng thấy rằng trừ khi chúng tôi làm đúng khi chọn lần đầu, bạn sẽ thắng: 1 - 1/3 = 2/3.
+
+3.9.2 Vấn đề sinh nhật
+Giả sử bạn đang ở trong một lớp học có 50 người. Nếu chúng ta giả sử đây là một nhóm được chọn ngẫu nhiên gồm 50 người thì khả năng có ít nhất hai người có cùng ngày sinh là bao nhiêu? Mặc dù nó có phần tiên tiến hơn nhưng chúng ta có thể suy luận điều này về mặt toán học. Chúng ta sẽ làm điều này sau. Ở đây chúng tôi sử dụng mô phỏng Monte Carlo. Để đơn giản, chúng tôi giả sử không có ai sinh vào ngày 29 tháng 2. Điều này thực ra không làm thay đổi nhiều câu trả lời.
+
+Đầu tiên, lưu ý rằng ngày sinh nhật có thể được biểu thị dưới dạng số từ 1 đến 365, do đó, có thể lấy mẫu 50 ngày sinh nhật như sau:
+
+n <- 50
+bdays <- sample(1:365, n, replace = TRUE)
+
+Để kiểm tra xem trong nhóm 50 người cụ thể này, chúng ta có ít nhất hai người có cùng ngày sinh hay không, chúng ta có thể sử dụng hàm duplicated, hàm này trả về TRUEbất cứ khi nào một phần tử của vectơ bị trùng lặp. Đây là một ví dụ:
+
+duplicated(c(1, 2, 3, 1, 4, 3, 5))
+#> [1] FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE
+
+Lần thứ hai 1 và 3 xuất hiện, chúng ta nhận được TRUE. Vì vậy, để kiểm tra xem hai ngày sinh nhật có giống nhau hay không, chúng ta chỉ cần sử dụng các hàm anyvà duplicatednhư thế này:
+
+any(duplicated(bdays))
+#> [1] TRUE
+
+Trong trường hợp này, chúng tôi thấy rằng nó đã xảy ra. Ít nhất có hai người có cùng ngày sinh.
+
+Để ước tính xác suất có cùng một ngày sinh trong nhóm, chúng tôi lặp lại thí nghiệm này bằng cách lấy mẫu lặp đi lặp lại các tập hợp gồm 50 ngày sinh:
+
+B <- 10000
+same_birthday <- function(n){
+  bdays <- sample(1:365, n, replace = TRUE)
+  any(duplicated(bdays))
+}
+results <- replicate(B, same_birthday(50))
+mean(results)
+#> [1] 0.969
+
+Bạn có mong đợi xác suất sẽ cao như vậy không?
+
+Mọi người có xu hướng đánh giá thấp những xác suất này. Để có trực giác tại sao nó lại cao như vậy, hãy nghĩ về điều gì sẽ xảy ra khi quy mô nhóm gần bằng 365. Ở giai đoạn này, chúng ta không còn nhiều ngày và xác suất là một.
+
+Giả sử chúng ta muốn sử dụng kiến ​​thức này để đặt cược với bạn bè về việc hai người có cùng ngày sinh trong một nhóm người. Khi nào cơ hội lớn hơn 50%? Lớn hơn 75%?
+
+Hãy tạo một bảng tra cứu. Chúng ta có thể nhanh chóng tạo một hàm để tính toán giá trị này cho bất kỳ quy mô nhóm nào:
+
+compute_prob <- function(n, B = 10000){
+  results <- replicate(B, same_birthday(n))
+  mean(results)
+}
+
+Sử dụng hàm sapply, chúng ta có thể thực hiện các thao tác theo phần tử trên bất kỳ hàm nào:
+
+n <- seq(1,60)
+prob <- sapply(n, compute_prob)
+
+Bây giờ chúng ta có thể vẽ đồ thị xác suất ước tính của hai người có cùng ngày sinh trong một nhóm có quy mô
+:
+
+library(tidyverse)
+prob <- sapply(n, compute_prob)
+qplot(n, prob)
+
+
+
+Bây giờ hãy tính xác suất chính xác thay vì sử dụng phép tính gần đúng Monte Carlo. Chúng tôi không chỉ nhận được câu trả lời chính xác bằng toán học mà còn tính toán nhanh hơn nhiều vì chúng tôi không phải tạo ra các thí nghiệm.
+
+Để làm cho phép toán đơn giản hơn, thay vì tính xác suất để điều đó xảy ra, chúng ta sẽ tính xác suất để điều đó không xảy ra. Để làm điều này, chúng tôi sử dụng quy tắc nhân.
+
+Hãy bắt đầu với người đầu tiên. Xác suất để người 1 có ngày sinh duy nhất là 1. Xác suất để người 2 có ngày sinh duy nhất, vì người 1 đã có một ngày sinh duy nhất, là 364/365. Sau đó, vì hai người đầu tiên có ngày sinh nhật khác nhau nên người thứ 3 có 363 ngày để lựa chọn. Chúng ta tiếp tục theo cách này và tìm khả năng để tất cả 50 người có một ngày sinh nhật độc nhất là:
+
+ 
+ 
+ 
+
+Chúng ta có thể viết một hàm thực hiện điều này với bất kỳ số nào:
+
+exact_prob <- function(n){
+  prob_unique <- seq(365,365 - n + 1)/365 
+  1 - prod( prob_unique)
+}
+eprob <- sapply(n, exact_prob)
+qplot(n, prob) + geom_line(aes(n, eprob), col = "red")
+
+
+
+Biểu đồ này cho thấy mô phỏng Monte Carlo đã đưa ra ước tính rất tốt về xác suất chính xác. Nếu không thể tính toán các xác suất chính xác thì chúng ta vẫn có thể ước tính chính xác các xác suất.
+
+3.10 Vô cực trong thực tế
+Lý thuyết được mô tả ở đây đòi hỏi phải lặp đi lặp lại các thí nghiệm mãi mãi. Trong thực tế, chúng tôi không thể làm điều này. Trong các ví dụ trên, chúng tôi đã sử dụng
+Các thí nghiệm ở Monte Carlo và hóa ra điều này mang lại những ước tính chính xác. Con số này càng lớn thì ước tính càng chính xác cho đến khi giá trị gần đúng tốt đến mức máy tính của bạn không thể phân biệt được. Nhưng trong những phép tính phức tạp hơn, 10.000 có thể gần như không đủ. Ngoài ra, đối với một số phép tính, 10.000 thí nghiệm có thể không khả thi về mặt tính toán. Trong thực tế, chúng ta không biết câu trả lời là gì, vì vậy chúng ta sẽ không biết liệu ước tính Monte Carlo của mình có chính xác hay không. Chúng ta biết rằng càng lớn
+, sự gần đúng càng tốt. Nhưng chúng ta cần nó lớn đến mức nào? Đây thực sự là một câu hỏi đầy thách thức và việc trả lời nó thường đòi hỏi phải đào tạo thống kê lý thuyết nâng cao.
+
+Một cách tiếp cận thực tế mà chúng tôi sẽ mô tả ở đây là kiểm tra tính ổn định của ước lượng. Sau đây là một ví dụ về bài toán sinh nhật của một nhóm 25 người.
+
+B <- 10^seq(1, 5, len = 100)
+compute_prob <- function(B, n=25){
+  same_day <- replicate(B, same_birthday(n))
+  mean(same_day)
+}
+prob <- sapply(B, compute_prob)
+plot(log10(B), prob)
+
+
+
+Trong biểu đồ này, chúng ta có thể thấy rằng các giá trị bắt đầu ổn định (nghĩa là chúng thay đổi nhỏ hơn 0,01) vào khoảng 1000. Lưu ý rằng xác suất chính xác mà chúng ta biết trong trường hợp này là 0,5686997.
+
+
+
+
+
+
+4   Xác suất liên tục
+Trong Phần 1.2 , chúng tôi đã giải thích lý do tại sao khi tóm tắt danh sách các giá trị số, chẳng hạn như chiều cao, việc xây dựng một phân phối xác định tỷ lệ cho từng kết quả có thể xảy ra là không hữu ích. Tương tự, đối với một biến ngẫu nhiên có thể nhận bất kỳ giá trị nào trong một tập hợp liên tục, không thể gán xác suất dương cho vô số giá trị có thể có. Ở đây chúng tôi mô tả cách chúng tôi xác định một cách toán học các phân bố cho các biến ngẫu nhiên liên tục và các phép tính gần đúng hữu ích thường được sử dụng trong phân tích dữ liệu.
+
+4.1 Hàm phân phối tích lũy
+Chúng tôi lấy chiều cao của học sinh nam trưởng thành làm ví dụ
+
+library(tidyverse)
+library(dslabs)
+x <- heights %>% filter(sex=="Male") %>% pull(height)
+
+và định nghĩa hàm phân phối tích lũy theo kinh nghiệm (eCDF) là
+
+F <- function(a) mean(x<=a)
+
+mà đối với bất kỳ giá trị nào a, sẽ đưa ra tỷ lệ các giá trị trong danh sách xnhỏ hơn hoặc bằng a.
+
+Hãy kết nối eCDF với xác suất bằng cách hỏi: nếu tôi chọn ngẫu nhiên một trong số các nam sinh, khả năng anh ta cao hơn 70,5 inch là bao nhiêu? Bởi vì mọi học sinh đều có cơ hội được chọn như nhau nên câu trả lời cho câu hỏi này tương đương với tỷ lệ học sinh cao hơn 70,5 inch. Sử dụng eCDF, chúng tôi nhận được câu trả lời bằng cách gõ:
+
+1 - F(70)
+#> [1] 0.377
+
+CDF là một phiên bản của eCDF gán các xác suất lý thuyết cho mỗi
+thay vì tỷ lệ được tính toán từ dữ liệu. Mặc dù, như chúng tôi vừa chứng minh, các tỷ lệ được tính toán từ dữ liệu có thể được sử dụng để xác định xác suất cho một biến ngẫu nhiên. Cụ thể là CDF cho kết quả ngẫu nhiên
+định nghĩa, cho bất kỳ số nào
+, xác suất quan sát được một giá trị lớn hơn
+.
+
+
+Khi CDF được xác định, chúng ta có thể sử dụng nó để tính xác suất của bất kỳ tập hợp con giá trị nào. Chẳng hạn, xác suất để một học sinh nằm giữa chiều cao avà chiều cao blà:
+
+
+Vì chúng ta có thể tính xác suất cho bất kỳ sự kiện có thể xảy ra nào theo cách này nên CDF xác định phân bố xác suất.
+
+4.2 Hàm mật độ xác suất
+Một kết quả toán học thực sự rất hữu ích trong thực tế là đối với hầu hết các CDF, chúng ta có thể định nghĩa một hàm, gọi nó là
+, điều đó cho phép chúng ta xây dựng CDF bằng Giải tích, như thế này:
+
+được gọi là hàm mật độ xác suất . Trực giác cho thấy ngay cả đối với các kết quả liên tục, chúng ta có thể xác định các khoảng nhỏ, gần như nhỏ bằng điểm, có xác suất dương. Nếu chúng ta coi kích thước của các khoảng này là đáy của hình chữ nhật thì hàm mật độ xác suất
+xác định chiều cao của hình chữ nhật sao cho tổng diện tích của các hình chữ nhật này gần đúng với xác suất
+. Tổng này có thể được viết dưới dạng tổng Reimann được tính gần đúng bằng tích phân:
+
+
+
+Một ví dụ về phân phối liên tục như vậy là phân phối chuẩn. Như chúng ta đã thấy trong Phần 1.5 , hàm mật độ xác suất được cho bởi:
+
+ 
+ 
+
+Phân phối tích lũy cho phân phối chuẩn được xác định bằng công thức toán học mà trong R có thể thu được bằng hàm pnorm. Chúng ta nói rằng một đại lượng ngẫu nhiên có phân phối chuẩn với độ lệch trung bình mvà độ lệch chuẩn snếu phân bố xác suất của nó được xác định bởi:
+
+F(a) = pnorm(a, m, s)
+
+Điều này rất hữu ích vì nếu chúng ta sẵn sàng sử dụng phép tính gần đúng thông thường cho chiều cao, chẳng hạn, chúng ta không cần toàn bộ tập dữ liệu để trả lời các câu hỏi như: xác suất để một học sinh được chọn ngẫu nhiên cao hơn 70 inch là bao nhiêu? Chúng ta chỉ cần chiều cao trung bình và độ lệch chuẩn:
+
+m <- mean(x)
+s <- sd(x)
+1 - pnorm(70.5, m, s)
+#> [1] 0.371
+
+4.3 Phân bố lý thuyết gần đúng
+Phân phối chuẩn có nguồn gốc toán học: chúng ta không cần dữ liệu để xác định nó. Đối với các nhà khoa học dữ liệu thực hành, hầu hết mọi việc chúng tôi làm đều liên quan đến dữ liệu. Về mặt kỹ thuật, dữ liệu luôn luôn rời rạc. Ví dụ: chúng ta có thể coi dữ liệu chiều cao của mình được phân loại với mỗi chiều cao cụ thể là một danh mục duy nhất. Phân phối xác suất được xác định bởi tỷ lệ học sinh báo cáo từng chiều cao. Đây là biểu đồ phân bố xác suất đó:
+
+
+
+Trong khi hầu hết học sinh làm tròn chiều cao của mình đến inch gần nhất, những học sinh khác báo cáo giá trị chính xác hơn. Một học sinh cho biết chiều cao của mình là 69,6850393700787, tức là 177 cm. Xác suất được ấn định cho chiều cao này là 0,0012315 hoặc 1 trên 812. Xác suất cho 70 inch cao hơn nhiều là 0,1059113, nhưng liệu có thực sự hợp lý khi coi xác suất chính xác là 70 inch khác với 69,6850393700787? Rõ ràng sẽ hữu ích hơn nhiều cho mục đích phân tích dữ liệu nếu coi kết quả này là một biến số liên tục, hãy nhớ rằng rất ít người, hoặc có lẽ không ai, cao chính xác là 70 inch và lý do chúng ta nhận được nhiều giá trị hơn ở mức 70 là vì mọi người tròn đến inch gần nhất.
+
+Với phân phối liên tục, xác suất của một giá trị số ít thậm chí không được xác định. Ví dụ, sẽ không có ý nghĩa gì nếu hỏi xác suất để giá trị được phân phối chuẩn là 70 là bao nhiêu. Thay vào đó, chúng ta xác định xác suất cho các khoảng. Do đó, chúng ta có thể hỏi xác suất để một người nào đó nằm trong khoảng từ 69,5 đến 70,5 là bao nhiêu.
+
+Trong các trường hợp như chiều cao, trong đó dữ liệu được làm tròn, phép tính gần đúng thông thường đặc biệt hữu ích nếu chúng ta xử lý các khoảng bao gồm chính xác một số làm tròn. Ví dụ: phân phối chuẩn rất hữu ích để ước tính tỷ lệ học sinh báo cáo các giá trị trong các khoảng như ba khoảng thời gian sau:
+
+mean(x <= 68.5) - mean(x <= 67.5)
+#> [1] 0.115
+mean(x <= 69.5) - mean(x <= 68.5)
+#> [1] 0.119
+mean(x <= 70.5) - mean(x <= 69.5)
+#> [1] 0.122
+
+Lưu ý mức độ gần đúng của chúng ta với phép tính gần đúng thông thường:
+
+pnorm(68.5, m, s) - pnorm(67.5, m, s) 
+#> [1] 0.103
+pnorm(69.5, m, s) - pnorm(68.5, m, s) 
+#> [1] 0.11
+pnorm(70.5, m, s) - pnorm(69.5, m, s) 
+#> [1] 0.108
+
+Tuy nhiên, phép tính gần đúng không hữu ích cho các khoảng thời gian khác. Ví dụ: hãy chú ý cách phân tích phép tính gần đúng khi chúng ta cố gắng ước tính:
+
+mean(x <= 70.9) - mean(x<=70.1)
+#> [1] 0.0222
+
+với
+
+pnorm(70.9, m, s) - pnorm(70.1, m, s)
+#> [1] 0.0836
+
+Nói chung, chúng tôi gọi tình huống này là rời rạc hóa . Mặc dù sự phân bố chiều cao thực là liên tục, chiều cao được báo cáo có xu hướng phổ biến hơn ở các giá trị rời rạc, trong trường hợp này là do làm tròn. Miễn là chúng ta biết cách đối phó với thực tế này thì phép tính gần đúng thông thường vẫn có thể là một công cụ rất hữu ích.
